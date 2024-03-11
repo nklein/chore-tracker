@@ -30,7 +30,7 @@ class Application:
         else:
             print("Real mode")
             factory = LEDButtonFactory()
-            print("Trying buttons")
+        print("Trying buttons")
         btest.tryButtons(factory)
 
     def main(self):

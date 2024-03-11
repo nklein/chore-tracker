@@ -1,6 +1,7 @@
 import time
 
 from iledbutton import ILEDButton
+from ibutton import ButtonState
 
 # Class for testing buttons
 class ButtonTester:
@@ -19,7 +20,12 @@ class ButtonTester:
     def rampIdleButtons(self, start, end, step):
         for cycle in range(start, end, step):
             for button in self.buttons:
-                if button.isPressed():
+                state = button.getButtonState()
+                if state == ButtonState.PRESSING:
+                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUTTON PRESSED")
+                elif state == ButtonState.RELEASING:
+                    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BUTTON RELEASED")
+                elif state == ButtonState.PRESSED:
                     button.setBrightness(0)
                 else:
                     button.setBrightness(cycle)
