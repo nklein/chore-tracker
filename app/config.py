@@ -6,7 +6,6 @@ class Config:
     DEFAULTS = "defaults"
     PEOPLE = "people"
     NAME = "name"
-    LEDBUTTON = "ledbutton"
     LED_PIN = "led_pin"
     BUTTON_PIN = "button_pin"
 
@@ -37,10 +36,10 @@ class Config:
         return self.config[Config.PEOPLE][handle][Config.NAME]
 
     def getPersonLEDPin(self, handle):
-        return self.config[Config.PEOPLE][handle][Config.LEDBUTTON][Config.LED_PIN]
+        return self.config[Config.PEOPLE][handle][Config.LED_PIN]
 
     def getPersonButtonPin(self, handle):
-        return self.config[Config.PEOPLE][handle][Config.LEDBUTTON][Config.BUTTON_PIN]
+        return self.config[Config.PEOPLE][handle][Config.BUTTON_PIN]
 
     def getPersonSchedule(self, handle, day):
         try:

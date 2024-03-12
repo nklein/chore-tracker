@@ -1,4 +1,8 @@
+import time
+
 from config import Config
+from lightcontrol import LightControl
+from person import Person
 
 import test.buttons as btest
 
@@ -6,6 +10,21 @@ from semma_qt.factory import LEDButtonFactory
 from sim.factory import LEDButtonFactory as SimLEDButtonFactory
 
 class Application:
+    DELAY = 1
+
+    def __init__(self):
+        self.config = Config()
+        self.people = dict()
+
+    def setupFactory(self):
+        print("Making button factory")
+        if self.config.isSimMode():
+            print("Simulation mode")
+            self.factory = SimLEDButtonFactory()
+        else:
+            print("Real mode")
+            self.factory = LEDButtonFactory()
+
     def printConfig(self):
         for handle in self.config.getHandles():
             print("===============================")
@@ -23,22 +42,35 @@ class Application:
             print("===============================")
 
     def testButtons(self):
-        print("Making button factory")
-        if self.config.isSimMode():
-            print("Simulation mode")
-            factory = SimLEDButtonFactory()
-        else:
-            print("Real mode")
-            factory = LEDButtonFactory()
         print("Trying buttons")
-        btest.tryButtons(factory)
+        btest.tryButtons(self.factory)
+        pass
+
+    def createPeople(self):
+        for handle in self.config.getHandles():
+            name = self.config.getPersonName(handle)
+            led_pin = self.config.getPersonLEDPin(handle)
+            button_pin = self.config.getPersonButtonPin(handle)
+            ledbutton = self.factory.makeLEDButton(led_pin, button_pin)
+            lightControl = LightControl(ledbutton)
+            self.people[handle] = Person(name, ledbutton, lightControl)
+        pass
+
+    def mainLoop(self):
+        while True:
+            for person in self.people.values():
+                person.tick()
+            time.sleep(Application.DELAY)
+        pass
 
     def main(self):
         print("Reading config file")
-        self.config = Config()
         self.config.readConfig()
         self.printConfig()
-        self.testButtons()
+        self.setupFactory()
+        self.createPeople()
+        self.mainLoop()
+        pass
 
 if __name__ == "__main__":
     app = Application()
