@@ -1,4 +1,5 @@
 import time
+import logging
 
 from iledbutton import ILEDButton
 from ibutton import ButtonState
@@ -6,6 +7,7 @@ from ibutton import ButtonState
 # Class for testing buttons
 class ButtonTester:
     def __init__(self, factory):
+        self.logger = logging.getLogger("test_btns")
         self.factory = factory
         self.delay = 1
         self.initButtons()
@@ -22,9 +24,9 @@ class ButtonTester:
             for button in self.buttons:
                 state = button.getButtonState()
                 if state == ButtonState.PRESSING:
-                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUTTON PRESSED")
+                    self.logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUTTON PRESSED")
                 elif state == ButtonState.RELEASING:
-                    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BUTTON RELEASED")
+                    self.logger.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BUTTON RELEASED")
                 elif state == ButtonState.PRESSED:
                     button.setBrightness(0)
                 else:
@@ -37,6 +39,6 @@ class ButtonTester:
 
 def tryButtons(factory):
     tester = ButtonTester(factory)
-    print("About to loop cycling buttons")
+    logging.getLogger("test_btns").info("About to loop cycling buttons")
     while True:
         tester.testButtons()

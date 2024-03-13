@@ -20,11 +20,12 @@ class Config:
 
     def __init__(self):
         self.config = dict()
+        pass
 
     def readConfig(self, config = "config.json"):
         with open(config, "r") as file:
             self.config = json.load(file)
-            print("Read configuration file")
+        pass
 
     def isSimMode(self):
         return self.config[Config.SIM_MODE]

@@ -1,4 +1,5 @@
 import time
+import logging
 from enum import Enum
 from ibutton import ButtonState
 from schedule import Schedule
@@ -13,6 +14,7 @@ class Person:
     SECONDS_UNTIL_REALLY_TIME = 30 * Schedule.SECONDS_PER_MINUTE
 
     def __init__(self, name, button, lightControl, schedule):
+        self.logger = logging.getLogger("person")
         self.name = name
         self.button = button
         self.lightControl = lightControl
@@ -46,7 +48,7 @@ class Person:
 
     def setState(self, state):
         if self.state != state:
-            print("[%s] State changed %s -> %s" % ( self.name, self.state, state))
+            self.logger.info("[%s] State changed %s -> %s" % ( self.name, self.state, state))
             self.state = state
             self.stateStarted = time.time()
             if self.state == PersonState.IDLE:

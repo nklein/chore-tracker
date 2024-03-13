@@ -1,4 +1,6 @@
 import time
+import logging
+import logging.handlers
 
 from config import Config
 from lightcontrol import LightControl
@@ -16,14 +18,15 @@ class Application:
     def __init__(self):
         self.config = Config()
         self.people = dict()
+        self.logger = logging.getLogger("app")
 
     def setupFactory(self):
-        print("Making button factory")
+        self.logger.debug("Making button factory")
         if self.config.isSimMode():
-            print("Simulation mode")
+            self.logger.info("Simulation mode")
             self.factory = SimLEDButtonFactory()
         else:
-            print("Real mode")
+            self.logger.info("Real mode")
             self.factory = LEDButtonFactory()
 
     def printConfig(self):
@@ -43,7 +46,7 @@ class Application:
             print("===============================")
 
     def testButtons(self):
-        print("Trying buttons")
+        self.logging.info("Trying buttons")
         btest.tryButtons(self.factory)
         pass
 
@@ -76,7 +79,7 @@ class Application:
         pass
 
     def main(self):
-        print("Reading config file")
+        self.logger.info("Reading config file")
         self.config.readConfig()
         self.printConfig()
         self.setupFactory()
@@ -85,5 +88,12 @@ class Application:
         pass
 
 if __name__ == "__main__":
+    streamLogHandler = logging.StreamHandler()
+    streamLogHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)8s [%(name)-8s] %(message)s"))
+
+    sysLogHandler = logging.handlers.SysLogHandler(address="/dev/log")
+    sysLogHandler.setFormatter(logging.Formatter("%(levelname)8s [%(name)-8s] %(message)s"))
+
+    logging.basicConfig(level=logging.INFO, handlers=[ streamLogHandler, sysLogHandler ])
     app = Application()
     app.main()
