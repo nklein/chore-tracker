@@ -3,6 +3,7 @@ import time
 from config import Config
 from lightcontrol import LightControl
 from person import Person
+from schedule import Schedule
 
 import test.buttons as btest
 
@@ -53,8 +54,19 @@ class Application:
             button_pin = self.config.getPersonButtonPin(handle)
             ledbutton = self.factory.makeLEDButton(led_pin, button_pin)
             lightControl = LightControl(ledbutton)
-            self.people[handle] = Person(name, ledbutton, lightControl)
+            schedule = self.scheduleForHandle(handle)
+            self.people[handle] = Person(name, ledbutton, lightControl, schedule)
         pass
+
+    def scheduleForHandle(self,handle):
+        sunday = self.config.getPersonSchedule(handle, Config.SUNDAY)
+        monday = self.config.getPersonSchedule(handle, Config.MONDAY)
+        tuesday = self.config.getPersonSchedule(handle, Config.TUESDAY)
+        wednesday = self.config.getPersonSchedule(handle, Config.WEDNESDAY)
+        thursday = self.config.getPersonSchedule(handle, Config.THURSDAY)
+        friday = self.config.getPersonSchedule(handle, Config.FRIDAY)
+        saturday = self.config.getPersonSchedule(handle, Config.SATURDAY)
+        return Schedule(sunday, monday, tuesday, wednesday, thursday, friday, saturday)
 
     def mainLoop(self):
         while True:

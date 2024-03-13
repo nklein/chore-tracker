@@ -10,5 +10,4 @@ class Button(IButton):
         self.path = os.path.join(tempfile.gettempdir(), str(self.button_pin))
 
     def isPressed(self):
-        print("### checking if button %d is pressed (%s)" % (self.button_pin, self.path))
         return os.path.exists(self.path)
