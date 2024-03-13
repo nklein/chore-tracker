@@ -7,14 +7,14 @@ from schedule import Schedule
 class PersonState(Enum):
     IDLE = 1
     TIME_FOR_CHORES = 2
-    REALLY_TIME_FOR_CHORES = 2
-    DOING_CHORES = 3
+    REALLY_TIME_FOR_CHORES = 3
+    DOING_CHORES = 4
 
 class Person:
-    SECONDS_UNTIL_REALLY_TIME = 30 * Schedule.SECONDS_PER_MINUTE
+    SECONDS_UNTIL_REALLY_TIME = 45 * Schedule.SECONDS_PER_MINUTE
 
     def __init__(self, name, button, lightControl, schedule):
-        self.logger = logging.getLogger("person")
+        self.logger = logging.getLogger(name)
         self.name = name
         self.button = button
         self.lightControl = lightControl
@@ -38,9 +38,9 @@ class Person:
             else:
                 self.setState(PersonState.IDLE)
 
-        if state == PersonState.IDLE and self.isTimeToStartChores():
+        if self.state == PersonState.IDLE and self.isTimeToStartChores():
             self.setState(PersonState.TIME_FOR_CHORES)
-        elif state == PersonState.TIME_FOR_CHORES and self.isReallyTimeToStartChores():
+        elif self.state == PersonState.TIME_FOR_CHORES and self.isReallyTimeToStartChores():
             self.setState(PersonState.REALLY_TIME_FOR_CHORES)
 
         self.lightControl.tick()
@@ -48,11 +48,15 @@ class Person:
 
     def setState(self, state):
         if self.state != state:
-            self.logger.info("[%s] State changed %s -> %s" % ( self.name, self.state, state))
+            self.logger.info("State changed %s -> %s" % ( self.state, state))
             self.state = state
             self.stateStarted = time.time()
             if self.state == PersonState.IDLE:
-                self.nextScheduledTime = self.findNextScheduledTime(self.stateStarted)
+                self.nextScheduledTime = self.schedule.getNextScheduledTime(self.stateStarted)
+                if self.nextScheduledTime == None:
+                    self.logger.info("No next chore time")
+                else:
+                    self.logger.info("Next chore time is %s" % ( time.ctime(self.nextScheduledTime) ))
                 self.lightControl.off()
             elif self.state == PersonState.TIME_FOR_CHORES:
                 self.lightControl.pulse(1)
@@ -62,15 +66,11 @@ class Person:
                 self.lightControl.on()
         pass
 
-    def findNextScheduledTime(self,after):
-        offset = self.schedule.getSecondsUntilNextScheduledTime(time.localtime(after))
-        if offset == None:
-            return None
-        else:
-            return after + offset
 
     def isTimeToStartChores(self):
         return self.nextScheduledTime != None and self.nextScheduledTime <= time.time()
 
     def isReallyTimeToStartChores(self):
-        return Person.SECONDS_UNTIL_REALLY_TIME <= time.time() - self.stateStarted
+        delta = time.time() - self.stateStarted
+        self.logger.debug("delta is: %d vs %d" % (delta, Person.SECONDS_UNTIL_REALLY_TIME))
+        return Person.SECONDS_UNTIL_REALLY_TIME <= delta

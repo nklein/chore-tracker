@@ -9,6 +9,6 @@ class LED(ILED):
 
     def setBrightness(self, brightness):
         if brightness != self.lastBrightness:
-            self.logger.info("Setting brightness %s -> %d for led %d"
-                             % (self.lastBrightness, brightness, self.led_pin))
+            self.logger.debug("Setting brightness %s -> %d for led %d"
+                              % (self.lastBrightness, brightness, self.led_pin))
             self.lastBrightness = brightness

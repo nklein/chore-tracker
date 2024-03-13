@@ -1,4 +1,5 @@
 import time
+import logging
 
 class Schedule:
     SECONDS_PER_MINUTE = 60
@@ -6,7 +7,10 @@ class Schedule:
     HOURS_IN_DAY = 24
     DAYS_IN_WEEK = 7
 
+    SECONDS_PER_DAY = HOURS_IN_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE
+
     def __init__(self, sunday, monday, tuesday, wednesday, thursday, friday, saturday):
+        self.logger = logging.getLogger("schedule")
         self.days = [
             self.parseDay(monday),
             self.parseDay(tuesday),
@@ -18,22 +22,34 @@ class Schedule:
         ]
         pass
 
-    def getSecondsUntilNextScheduledTime(self, now=time.localtime()):
-        currentSecondsIntoDay = self.secondsIntoDay(now)
-        nowDay = now.tm_wday
+    def getNextScheduledTime(self, now=time.time()):
+        localTime = time.localtime(now)
+        currentSecondsIntoDay = self.secondsIntoDay(time.localtime(now))
+        nowDay = localTime.tm_wday
 
         found = None
         dayFromNow = 0
-        while found == None and dayFromNow < Schedule.DAYS_IN_WEEK:
+        secondsAdded = 0
+
+        #
+        # Note: loop goes through eight days in case the next chore date
+        # is one week from earlier today
+        #
+        self.logger.debug("Getting next scheduled time from %s" % (time.ctime(now)))
+        while found == None and dayFromNow <= Schedule.DAYS_IN_WEEK:
             dayToCheck = ( dayFromNow + nowDay ) % Schedule.DAYS_IN_WEEK
             timeToCheck = currentSecondsIntoDay if dayFromNow == 0 else 0
+            self.logger.debug("checking day %d" % (dayFromNow))
             found = self.findNextTime(self.days[dayToCheck],timeToCheck)
-            dayFromNow += 1
+            if found == None:
+                secondsAdded += Schedule.SECONDS_PER_DAY - timeToCheck
+                dayFromNow += 1
+            elif dayFromNow == 0:
+                found -= currentSecondsIntoDay
 
         if found != None:
-            found += dayFromNow * Schedule.HOURS_IN_DAY * Schedule.MINUTES_PER_HOUR * Schedule.SECONDS_PER_MINUTE
-            found -= currentSecondsIntoDay
-
+            self.logger.debug("Got %s which is %s with %d seconds added" % (found, time.ctime(found + secondsAdded + now), secondsAdded))
+            found += secondsAdded + now
         return found
 
     def parseDay(self,day):
