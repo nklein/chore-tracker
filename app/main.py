@@ -1,4 +1,6 @@
 import time
+import getopt
+import sys
 import logging
 import logging.handlers
 
@@ -15,10 +17,12 @@ from sim.factory import LEDButtonFactory as SimLEDButtonFactory
 class Application:
     DELAY = 0.01
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
+        self.config = Config()
         self.people = dict()
-        self.logger = logging.getLogger("app")
+        self.configFile = "../etc/config.json"
+        self.daemonMode = False
+        self.logger = None
 
     def setupFactory(self):
         self.logger.debug("Making button factory")
@@ -28,6 +32,7 @@ class Application:
         else:
             self.logger.info("Real mode")
             self.factory = LEDButtonFactory()
+        return 0
 
     def testButtons(self):
         self.logger.info("Trying buttons")
@@ -43,7 +48,7 @@ class Application:
             lightControl = LightControl(ledbutton)
             schedule = self.scheduleForHandle(handle)
             self.people[handle] = Person(name, ledbutton, lightControl, schedule)
-        pass
+        return 0
 
     def scheduleForHandle(self,handle):
         sunday = self.config.getPersonSchedule(handle, Config.SUNDAY)
@@ -60,30 +65,65 @@ class Application:
             for person in self.people.values():
                 person.tick()
             time.sleep(Application.DELAY)
+        return 0
+
+    def setupLogger(self):
+        handlers = []
+
+        if self.daemonMode:
+            sysLogHandler = logging.handlers.SysLogHandler(address="/dev/log")
+            sysLogHandler.setFormatter(logging.Formatter("%(levelname)8s [%(name)-8s] %(message)s"))
+            handlers.append(sysLogHandler)
+        else:
+            streamLogHandler = logging.StreamHandler()
+            streamLogHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)8s [%(name)-8s] %(message)s"))
+            handlers.append(streamLogHandler)
+
+        logging.basicConfig(level=logging.INFO, handlers=handlers)
+        self.logger = logging.getLogger("app")
         pass
+
+    def usage(self):
+        print("python main.py [--config config-file][--daemon]")
+        pass
+
+    def parseArgs(self):
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], "c:dh", ["config=", "daemon", "help"])
+        except getopt.GetoptError as err:
+            print(err)
+            self.usage()
+            return 2
+
+        for o, a in opts:
+            if o in ( "-c", "--config" ):
+                self.configFile = a
+            elif o in ( "-d", "--daemon" ):
+                self.daemonMode = True
+            elif o in ( "-h", "--help" ):
+                self.usage()
+                return 2
+            else:
+                print( "unhandled option: %s" % (o) )
+                return 1
+        return 0
+
+    def readConfig(self):
+        self.logger.info("Reading config file")
+        self.config.readConfig(self.configFile)
+        self.config.printConfig()
+        return 0
 
     def main(self):
-        self.logger.info("Reading config file")
-        self.config.printConfig()
-        self.setupFactory()
-        self.createPeople()
-        self.mainLoop()
-        pass
+        return (
+            self.parseArgs()
+            or self.setupLogger()
+            or self.readConfig()
+            or self.setupFactory()
+            or self.createPeople()
+            or self.mainLoop()
+        )
 
 if __name__ == "__main__":
-    config = Config()
-    config.readConfig()
-
-    handlers = []
-
-    streamLogHandler = logging.StreamHandler()
-    streamLogHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)8s [%(name)-8s] %(message)s"))
-    handlers.append(streamLogHandler)
-
-    sysLogHandler = logging.handlers.SysLogHandler(address="/dev/log")
-    sysLogHandler.setFormatter(logging.Formatter("%(levelname)8s [%(name)-8s] %(message)s"))
-    handlers.append(sysLogHandler)
-
-    logging.basicConfig(level=logging.INFO, handlers=handlers)
-    app = Application(config)
-    app.main()
+    app = Application()
+    sys.exit(app.main())

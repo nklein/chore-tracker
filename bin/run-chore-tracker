@@ -7,4 +7,4 @@ export PATH
 
 . ${CHORE_TRACKER_DIR}/python-venv/bin/activate \
     && cd ${CHORE_TRACKER_DIR}/app \
-    && exec python3 main.py 2>/dev/null 1>/dev/null
+    && exec python3 main.py "$@" 2>/dev/null 1>/dev/null
