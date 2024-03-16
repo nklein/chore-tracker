@@ -9,7 +9,7 @@ from schedule import Schedule
 
 import test.buttons as btest
 
-from semma_qt.factory import LEDButtonFactory
+from stemma_qt.factory import LEDButtonFactory
 from sim.factory import LEDButtonFactory as SimLEDButtonFactory
 
 class Application:
