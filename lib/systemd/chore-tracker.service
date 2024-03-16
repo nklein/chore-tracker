@@ -4,6 +4,10 @@ After=multi-user.target
 
 [Service]
 ExecStart=##INSTALL_DIR##/bin/run-chore-tracker
+Restart=always
+RestartSec=10s
+User=pat
+Group=pat
 
 [Install]
 WantedBy=multi-user.target
