@@ -1,0 +1,9 @@
+[Unit]
+Description=Arcade-button application for signalling chore-time
+After=multi-user.target
+
+[Service]
+ExecStart=##INSTALL_DIR##/bin/run-chore-tracker
+
+[Install]
+WantedBy=multi-user.target

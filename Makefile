@@ -6,7 +6,7 @@ VENV := $(INSTALL_DIR)/python-venv
 IN_VENV := . $(VENV)/bin/activate &&
 
 ################################################################################################
-install: install-packages install-app install-config install-bin
+install: install-packages install-app install-config install-bin install-lib
 .PHONY: install
 
 install-packages: $(INSTALL_DIR)/requirements.txt
@@ -20,8 +20,11 @@ install-config: $(INSTALL_DIR)/app/config.json
 .PHONY: install-config
 
 install-bin: $(INSTALL_DIR)
-	rsync -a --exclude=__pycache__ --exclude=config.json bin $(INSTALL_DIR)
+	rsync -a bin $(INSTALL_DIR)
 .PHONY: install-bin
+
+install-lib: $(INSTALL_DIR)/lib/systemd/chore-tracker.service
+.PHONY: install-lib
 
 ################################################################################################
 $(VENV):
@@ -38,3 +41,11 @@ $(INSTALL_DIR)/requirements.txt: $(VENV) requirements.txt
 
 $(INSTALL_DIR)/app/config.json:
 	cp -p app/config.json $(@)
+
+$(INSTALL_DIR)/lib/systemd/chore-tracker.service: lib/systemd/chore-tracker.service
+	@[ -d $(INSTALL_DIR) ] || make $(INSTALL_DIR)
+	cp $(<) $(@)
+	@if grep -q '##INSTALL_DIR##' $(@); then \
+	    sed -i -e "s!##INSTALL_DIR##!$(INSTALL_DIR)!g" $(@) \
+	        && sudo systemctl enable $(@) ; \
+	fi
