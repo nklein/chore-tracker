@@ -9,7 +9,7 @@ class ButtonTester:
     def __init__(self, factory):
         self.logger = logging.getLogger("test_btns")
         self.factory = factory
-        self.delay = 1
+        self.delay = 0.01
         self.initButtons()
 
     def initButtons(self):
@@ -24,9 +24,9 @@ class ButtonTester:
             for button in self.buttons:
                 state = button.getButtonState()
                 if state == ButtonState.PRESSING:
-                    self.logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUTTON PRESSED")
+                    self.logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUTTON PRESSED %s" % (button))
                 elif state == ButtonState.RELEASING:
-                    self.logger.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BUTTON RELEASED")
+                    self.logger.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BUTTON RELEASED %s" % (button))
                 elif state == ButtonState.PRESSED:
                     button.setBrightness(0)
                 else:

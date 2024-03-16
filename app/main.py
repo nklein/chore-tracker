@@ -13,10 +13,10 @@ from semma_qt.factory import LEDButtonFactory
 from sim.factory import LEDButtonFactory as SimLEDButtonFactory
 
 class Application:
-    DELAY = 1
+    DELAY = 0.01
 
-    def __init__(self):
-        self.config = Config()
+    def __init__(self, config):
+        self.config = config
         self.people = dict()
         self.logger = logging.getLogger("app")
 
@@ -29,24 +29,8 @@ class Application:
             self.logger.info("Real mode")
             self.factory = LEDButtonFactory()
 
-    def printConfig(self):
-        for handle in self.config.getHandles():
-            print("===============================")
-            print("    handle: %s" % (handle))
-            print("      name: %s" % (self.config.getPersonName(handle)))
-            print("   led_pin: %s" % (self.config.getPersonLEDPin(handle)))
-            print("button_pin: %s" % (self.config.getPersonButtonPin(handle)))
-            print("    sunday: %s" % (self.config.getPersonSchedule(handle, Config.SUNDAY)))
-            print("    monday: %s" % (self.config.getPersonSchedule(handle, Config.MONDAY)))
-            print("   tuesday: %s" % (self.config.getPersonSchedule(handle, Config.TUESDAY)))
-            print(" wednesday: %s" % (self.config.getPersonSchedule(handle, Config.WEDNESDAY)))
-            print("  thursday: %s" % (self.config.getPersonSchedule(handle, Config.THURSDAY)))
-            print("    friday: %s" % (self.config.getPersonSchedule(handle, Config.FRIDAY)))
-            print("  saturday: %s" % (self.config.getPersonSchedule(handle, Config.SATURDAY)))
-            print("===============================")
-
     def testButtons(self):
-        self.logging.info("Trying buttons")
+        self.logger.info("Trying buttons")
         btest.tryButtons(self.factory)
         pass
 
@@ -80,20 +64,26 @@ class Application:
 
     def main(self):
         self.logger.info("Reading config file")
-        self.config.readConfig()
-        self.printConfig()
+        self.config.printConfig()
         self.setupFactory()
         self.createPeople()
         self.mainLoop()
         pass
 
 if __name__ == "__main__":
+    config = Config()
+    config.readConfig()
+
+    handlers = []
+
     streamLogHandler = logging.StreamHandler()
     streamLogHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)8s [%(name)-8s] %(message)s"))
+    handlers.append(streamLogHandler)
 
     sysLogHandler = logging.handlers.SysLogHandler(address="/dev/log")
     sysLogHandler.setFormatter(logging.Formatter("%(levelname)8s [%(name)-8s] %(message)s"))
+    handlers.append(sysLogHandler)
 
-    logging.basicConfig(level=logging.INFO, handlers=[ streamLogHandler, sysLogHandler ])
-    app = Application()
+    logging.basicConfig(level=logging.INFO, handlers=handlers)
+    app = Application(config)
     app.main()

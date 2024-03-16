@@ -27,6 +27,23 @@ class Config:
             self.config = json.load(file)
         pass
 
+    def printConfig(self):
+        print("simulated %s", (self.isSimMode()))
+        for handle in self.getHandles():
+            print("===============================")
+            print("    handle: %s" % (handle))
+            print("      name: %s" % (self.getPersonName(handle)))
+            print("   led_pin: %s" % (self.getPersonLEDPin(handle)))
+            print("button_pin: %s" % (self.getPersonButtonPin(handle)))
+            print("    sunday: %s" % (self.getPersonSchedule(handle, Config.SUNDAY)))
+            print("    monday: %s" % (self.getPersonSchedule(handle, Config.MONDAY)))
+            print("   tuesday: %s" % (self.getPersonSchedule(handle, Config.TUESDAY)))
+            print(" wednesday: %s" % (self.getPersonSchedule(handle, Config.WEDNESDAY)))
+            print("  thursday: %s" % (self.getPersonSchedule(handle, Config.THURSDAY)))
+            print("    friday: %s" % (self.getPersonSchedule(handle, Config.FRIDAY)))
+            print("  saturday: %s" % (self.getPersonSchedule(handle, Config.SATURDAY)))
+            print("===============================")
+
     def isSimMode(self):
         return self.config[Config.SIM_MODE]
 

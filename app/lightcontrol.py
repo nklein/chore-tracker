@@ -72,4 +72,4 @@ class LightControl:
         lessThanHalfway = ( distance * 2 <= LightControl.PULSE_WAVELENGTH )
         height = distance if lessThanHalfway else ( LightControl.PULSE_WAVELENGTH - distance )
         delta = ( LightControl.MAX_BRIGHTNESS - LightControl.MIN_BRIGHTNESS ) * height * 2
-        return ( delta / LightControl.PULSE_WAVELENGTH ) + LightControl.MIN_BRIGHTNESS
+        return round(( delta / LightControl.PULSE_WAVELENGTH ) + LightControl.MIN_BRIGHTNESS)

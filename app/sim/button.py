@@ -14,3 +14,6 @@ class Button(IButton):
     def isPressed(self):
         self.logger.debug("Checking for button: %d (%s)" % (self.button_pin, self.path))
         return os.path.exists(self.path)
+
+    def __str__(self):
+        return str(self.button_pin)
