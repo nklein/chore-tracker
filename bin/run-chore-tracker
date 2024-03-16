@@ -1,0 +1,10 @@
+#!/bin/bash
+
+CHORE_TRACKER_DIR=${CHORE_TRACKER_DIR:-$(/usr/bin/dirname $(/usr/bin/realpath $(/usr/bin/dirname $0)))}
+
+PATH=${CHORE_TRACKER_DIR}/bin:/bin:/usr/bin:/usr/local/bin
+export PATH
+
+. ${CHORE_TRACKER_DIR}/python-venv/bin/activate \
+    && cd ${CHORE_TRACKER_DIR}/app \
+    && exec python3 main.py

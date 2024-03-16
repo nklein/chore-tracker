@@ -1,31 +1,40 @@
-TAG := docker-chore-tracker
+################################################################################################
+INSTALL_DIR := /usr/local/chore-tracker
 
-include docker-support.mk
+################################################################################################
+VENV := $(INSTALL_DIR)/python-venv
+IN_VENV := . $(VENV)/bin/activate &&
 
-build-container: build-container-$(TAG)
+################################################################################################
+install: install-packages install-app install-config install-bin
+.PHONY: install
 
-build-image-$(TAG): Dockerfile requirements.txt
-build-image-$(TAG): $(shell find app -type f -print)
+install-packages: $(INSTALL_DIR)/requirements.txt
+.PHONY: install-packages
 
-clean: clean-image-$(TAG)
-clean: clean-docker-image-$(TAG)
-clean: clean-container-$(TAG)
-clean: clean-docker-container-$(TAG)
+install-app: $(INSTALL_DIR)
+	rsync -a --exclude=__pycache__ --exclude=config.json app $(INSTALL_DIR)
+.PHONY: install-app
 
-clean-docker-image-$(TAG): clean-docker-container-$(TAG)
+install-config: $(INSTALL_DIR)/app/config.json
+.PHONY: install-config
 
-make-virtual-env: cannot-have-virtual-env
-	python3 -m venv $(PWD)/python-venv
-.PHONY: make-virtual-env
+install-bin: $(INSTALL_DIR)
+	rsync -a --exclude=__pycache__ --exclude=config.json bin $(INSTALL_DIR)
+.PHONY: install-bin
 
-prepare-virtual-env: need-virtual-env requirements.txt
-	pip3 install --no-cache-dir -r requirements.txt
-.PHONY: prepare-virtual-env
+################################################################################################
+$(VENV):
+	@[ -d $(INSTALL_DIR) ] || make $(INSTALL_DIR)
+	python3 -m venv $(VENV)
 
-need-virtual-env:
-	@[ -n "${VIRTUAL_ENV}" ]
-.PHONY: need-virtual-env
+$(INSTALL_DIR):
+	sudo mkdir -p $(@)
+	sudo chown $(USER) $(@)
 
-cannot-have-virtual-env:
-	@[ -z "${VIRTUAL_ENV}" ]
-.PHONY: cannot-have-virtual-env
+$(INSTALL_DIR)/requirements.txt: $(VENV) requirements.txt
+	$(IN_VENV) pip3 install --no-cache-dir -r requirements.txt
+	cp requirements.txt $(@D)
+
+$(INSTALL_DIR)/app/config.json:
+	cp -p app/config.json $(@)
