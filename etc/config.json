@@ -1,0 +1,45 @@
+{
+  "sim_mode": false,
+  "defaults": {
+    "schedule": {
+      "sunday": [ "15:00" ],
+      "monday": [ "16:00" ],
+      "tuesday": [],
+      "wednesday": [ "16:00" ],
+      "thursday": [ "16:00" ],
+      "friday": [ "16:00" ],
+      "saturday": [ "15:00" ]
+    }
+  },
+  "people": {
+    "isaac": {
+      "name": "Isaac",
+      "led_pin": 1,
+      "button_pin": 2,
+      "schedule": {
+        "sunday": [],
+        "monday": [],
+        "tuesday": [],
+        "wednesday": [],
+        "thursday": [],
+        "friday": [],
+        "saturday": []
+      }
+    },
+    "raphael": {
+      "name": "Raphael",
+      "led_pin": 0,
+      "button_pin": 20
+    },
+    "saul": {
+      "name": "Saul",
+      "led_pin": 13,
+      "button_pin": 19
+    },
+    "naomi": {
+      "name": "Naomi",
+      "led_pin": 12,
+      "button_pin": 18
+    }
+  }
+}

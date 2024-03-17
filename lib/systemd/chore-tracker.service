@@ -1,0 +1,13 @@
+[Unit]
+Description=Arcade-button application for signalling chore-time
+After=multi-user.target
+
+[Service]
+ExecStart=##INSTALL_DIR##/bin/run-chore-tracker --config ##INSTALL_DIR##/etc/config.json --daemon
+Restart=always
+RestartSec=10s
+User=pat
+Group=pat
+
+[Install]
+WantedBy=multi-user.target

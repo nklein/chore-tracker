@@ -1,4 +1,4 @@
-# CHORE-TRACKER
+# CHORE-TRACKER v1.0.20240316
 
 ## Overview
 
