@@ -42,7 +42,7 @@ class LightControl:
 
     def off(self):
         self.speed = 0
-        self.brightness = LightControl.MIN_BRIGHTNESS
+        self.brightness = 0
         self.__set_light__()
         pass
 
