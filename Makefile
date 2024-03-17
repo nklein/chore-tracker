@@ -13,10 +13,10 @@ install-packages: $(INSTALL_DIR)/requirements.txt
 .PHONY: install-packages
 
 install-app: $(INSTALL_DIR)
-	rsync -a --exclude=__pycache__ --exclude=config.json app $(INSTALL_DIR)
+	rsync -a --exclude=__pycache__ app $(INSTALL_DIR)
 .PHONY: install-app
 
-install-config: $(INSTALL_DIR)/app/config.json
+install-config: $(INSTALL_DIR)/etc/config.json
 .PHONY: install-config
 
 install-bin: $(INSTALL_DIR)
@@ -39,8 +39,8 @@ $(INSTALL_DIR)/requirements.txt: $(VENV) requirements.txt
 	$(IN_VENV) pip3 install --no-cache-dir -r requirements.txt
 	cp requirements.txt $(@D)
 
-$(INSTALL_DIR)/app/config.json:
-	cp -p app/config.json $(@)
+$(INSTALL_DIR)/etc/config.json:
+	cp -p etc/config.json $(@)
 
 $(INSTALL_DIR)/lib/systemd/chore-tracker.service: lib/systemd/chore-tracker.service
 	@[ -d $(INSTALL_DIR) ] || make $(INSTALL_DIR)
