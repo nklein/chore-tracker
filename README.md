@@ -46,12 +46,17 @@ Unless your `etc/config.json` specifies `"sim_mode": true`, you should stop the 
 
     systemctl stop chore-tracker.service
 
-## TODO
+## Assembly
 
-1. allow configuration of urgency window and loop speed
-2. separate button configuration from user configuration
-3. remote viewing of current state
-4. stats collecting
-5. gamification of stats
-6. bonus chores
-7. local screen for browsing stats
+This [Adafruit wishlist](http://www.adafruit.com/wishlists/589136) shows the materials that I used to create this project.
+You will need to [enable I2C on your Raspberry Pi](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c) using `raspi-config` if it is not already enabled.
+
+I used the [Adafruit tutorial on the STEMMA-QT Arcade button controller](https://learn.adafruit.com/adafruit-led-arcade-button-qt) to get me familiar with the hardware and the I2C.
+
+![Image of version 1.0](images/chore-tracker-1.0.jpg)
+
+You can download the [SVG file I used to make this box](images/chore-tracker-box-1.0.svg).
+
+## Issues and Enhancements
+
+Issues and enhancments are being tracked on the [github chore-tracker project](https://github.com/nklein/chore-tracker/issues)
