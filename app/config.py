@@ -6,6 +6,7 @@ class Config:
     DEFAULTS = "defaults"
 
     LEDBUTTONS = "ledbuttons"
+    ADDR = "addr"
     LED_PIN = "led_pin"
     BUTTON_PIN = "button_pin"
 
@@ -45,6 +46,7 @@ class Config:
         for button in self.getLEDButtonNames():
             print("===============================")
             print("    button: %s" % (button))
+            print("      addr: %x" % (self.getLEDButtonAddr(button)))
             print("   led_pin: %s" % (self.getLEDButtonLEDPin(button)))
             print("button_pin: %s" % (self.getLEDButtonButtonPin(button)))
             print("===============================")
@@ -81,6 +83,9 @@ class Config:
     def getLEDButtonNames(self):
         return list(self.config[Config.LEDBUTTONS].keys())
 
+    def getLEDButtonAddr(self, button):
+        return self.config[Config.LEDBUTTONS][button][Config.ADDR];
+
     def getLEDButtonLEDPin(self, button):
         return self.config[Config.LEDBUTTONS][button][Config.LED_PIN];
 
@@ -95,6 +100,9 @@ class Config:
 
     def getPersonLEDButtonName(self, handle):
         return self.config[Config.PEOPLE][handle][Config.LEDBUTTON]
+
+    def getPersonLEDButtonAddr(self, handle):
+        return self.getLEDButtonAddr(self.getPersonLEDButtonName(handle))
 
     def getPersonLEDPin(self, handle):
         return self.getLEDButtonLEDPin(self.getPersonLEDButtonName(handle))

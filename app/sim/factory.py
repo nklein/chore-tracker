@@ -7,5 +7,5 @@ class LEDButtonFactory(ILEDButtonFactory):
     def __init__(self):
         pass
 
-    def makeLEDButton(self, led_pin, button_pin):
-        return LEDButton(led_pin, button_pin)
+    def makeLEDButton(self, addr, led_pin, button_pin):
+        return LEDButton(addr, led_pin, button_pin)

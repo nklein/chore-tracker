@@ -47,9 +47,10 @@ class Application:
             name = self.config.getPersonName(handle)
             ledbuttonName = self.config.getPersonLEDButtonName(handle)
             ledbuttons[ ledbuttonName ] = True
+            addr = self.config.getPersonLEDButtonAddr(handle)
             led_pin = self.config.getPersonLEDPin(handle)
             button_pin = self.config.getPersonButtonPin(handle)
-            ledbutton = self.factory.makeLEDButton(led_pin, button_pin)
+            ledbutton = self.factory.makeLEDButton(addr, led_pin, button_pin)
             lightControl = LightControl(ledbuttonName, ledbutton)
             schedule = self.scheduleForHandle(handle)
             self.people[handle] = Person(name, ledbutton, lightControl, schedule, overdueTimeout)
