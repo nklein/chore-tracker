@@ -13,24 +13,23 @@ class PersonState(Enum):
 class Person:
     SECONDS_UNTIL_REALLY_TIME = 45 * Schedule.SECONDS_PER_MINUTE
 
-    def __init__(self, name, button, lightControl, schedule):
+    def __init__(self, name, button, lightControl, schedule, overdueTimeout):
         self.logger = logging.getLogger(name)
         self.name = name
         self.button = button
         self.lightControl = lightControl
         self.schedule = schedule
+        self.overdueTimeout = overdueTimeout
         self.state = None
         self.setState(PersonState.IDLE)
         pass
 
-    def tick(self):
-        state = self.button.getButtonState()
-        if state == ButtonState.PRESSED:
+    def tick(self, now=time.time()):
+        btnState = self.button.getButtonState()
+        if btnState == ButtonState.PRESSING:
             self.lightControl.disable()
-        else:
+        elif btnState == ButtonState.RELEASING:
             self.lightControl.enable()
-
-        if state == ButtonState.RELEASING:
             if self.state == PersonState.IDLE:
                 self.setState(PersonState.TIME_FOR_CHORES)
             elif self.state == PersonState.TIME_FOR_CHORES or self.state == PersonState.REALLY_TIME_FOR_CHORES:
@@ -43,7 +42,7 @@ class Person:
         elif self.state == PersonState.TIME_FOR_CHORES and self.isReallyTimeToStartChores():
             self.setState(PersonState.REALLY_TIME_FOR_CHORES)
 
-        self.lightControl.tick()
+        self.lightControl.tick(now)
         pass
 
     def setState(self, state):
@@ -72,5 +71,5 @@ class Person:
 
     def isReallyTimeToStartChores(self):
         delta = time.time() - self.stateStarted
-        self.logger.debug("delta is: %d vs %d" % (delta, Person.SECONDS_UNTIL_REALLY_TIME))
-        return Person.SECONDS_UNTIL_REALLY_TIME <= delta
+        self.logger.debug("delta is: %d vs %d" % (delta, self.overdueTimeout))
+        return self.overdueTimeout <= delta

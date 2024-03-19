@@ -2,7 +2,7 @@ import logging
 from iled import ILED
 
 class LED(ILED):
-    def __init__(self, led_pin):
+    def __init__(self, addr, led_pin):
         self.logger = logging.getLogger("sim_led")
         self.led_pin = led_pin
         self.lastBrightness = None
@@ -12,3 +12,6 @@ class LED(ILED):
             self.logger.debug("Setting brightness %s -> %d for led %d"
                               % (self.lastBrightness, brightness, self.led_pin))
             self.lastBrightness = brightness
+
+    def __str__(self):
+        return "l%s" % (str(self.led_pin))

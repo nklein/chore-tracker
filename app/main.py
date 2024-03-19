@@ -15,14 +15,14 @@ from stemma_qt.factory import LEDButtonFactory
 from sim.factory import LEDButtonFactory as SimLEDButtonFactory
 
 class Application:
-    DELAY = 0.01
-
     def __init__(self):
         self.config = Config()
         self.people = dict()
         self.configFile = "../etc/config.json"
         self.daemonMode = False
         self.logger = None
+        self.loopDelay = 0.01
+        pass
 
     def setupFactory(self):
         self.logger.debug("Making button factory")
@@ -40,14 +40,25 @@ class Application:
         pass
 
     def createPeople(self):
+        ledbuttons = dict()
+        overdueTimeout = self.config.getOverdueTimeout()
+
         for handle in self.config.getHandles():
             name = self.config.getPersonName(handle)
+            ledbuttonName = self.config.getPersonLEDButtonName(handle)
+            ledbuttons[ ledbuttonName ] = True
+            addr = self.config.getPersonLEDButtonAddr(handle)
             led_pin = self.config.getPersonLEDPin(handle)
             button_pin = self.config.getPersonButtonPin(handle)
-            ledbutton = self.factory.makeLEDButton(led_pin, button_pin)
-            lightControl = LightControl(ledbutton)
+            ledbutton = self.factory.makeLEDButton(addr, led_pin, button_pin)
+            lightControl = LightControl(ledbuttonName, ledbutton)
             schedule = self.scheduleForHandle(handle)
-            self.people[handle] = Person(name, ledbutton, lightControl, schedule)
+            self.people[handle] = Person(name, ledbutton, lightControl, schedule, overdueTimeout)
+
+        if len(ledbuttons.keys()) < len(self.config.getHandles()):
+            self.logger.fatal("Fewer buttons (%s) than people (%s)"
+                              % (list(ledbuttons.keys()), self.config.getHandles()))
+            return 1
         return 0
 
     def scheduleForHandle(self,handle):
@@ -62,9 +73,10 @@ class Application:
 
     def mainLoop(self):
         while True:
+            now = time.time()
             for person in self.people.values():
-                person.tick()
-            time.sleep(Application.DELAY)
+                person.tick(now)
+            time.sleep(self.loopDelay)
         return 0
 
     def setupLogger(self):
@@ -114,11 +126,16 @@ class Application:
         self.config.printConfig()
         return 0
 
+    def setupLocalParameters(self):
+        self.loopDelay = self.config.getLoopDelay()
+        return 0
+
     def main(self):
         return (
             self.parseArgs()
             or self.setupLogger()
             or self.readConfig()
+            or self.setupLocalParameters()
             or self.setupFactory()
             or self.createPeople()
             or self.mainLoop()
