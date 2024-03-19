@@ -10,4 +10,4 @@ class LEDButton(LED, Button, ILEDButton):
         self.addr = arcade_qt.i2c_device.device_address
 
     def __str__(self):
-        return "%s/%s@%s" % (LED.__str__(self), Button.__str__(self), self.addr)
+        return "%s/%s@%x" % (LED.__str__(self), Button.__str__(self), self.addr)
