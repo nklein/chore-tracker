@@ -5,7 +5,7 @@ import logging
 from ibutton import IButton;
 
 class Button(IButton):
-    def __init__(self, button_pin):
+    def __init__(self, addr, button_pin):
         IButton.__init__(self)
         self.logger = logging.getLogger("sim_btn")
         self.button_pin = button_pin
