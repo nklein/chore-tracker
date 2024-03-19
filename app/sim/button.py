@@ -16,4 +16,4 @@ class Button(IButton):
         return os.path.exists(self.path)
 
     def __str__(self):
-        return str(self.button_pin)
+        return "b%s" % (str(self.button_pin))
