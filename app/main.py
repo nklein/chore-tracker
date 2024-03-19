@@ -40,6 +40,7 @@ class Application:
         pass
 
     def createPeople(self):
+        overdueTimeout = self.config.getOverdueTimeout()
         for handle in self.config.getHandles():
             name = self.config.getPersonName(handle)
             led_pin = self.config.getPersonLEDPin(handle)
@@ -47,7 +48,7 @@ class Application:
             ledbutton = self.factory.makeLEDButton(led_pin, button_pin)
             lightControl = LightControl(ledbutton)
             schedule = self.scheduleForHandle(handle)
-            self.people[handle] = Person(name, ledbutton, lightControl, schedule)
+            self.people[handle] = Person(name, ledbutton, lightControl, schedule, overdueTimeout)
         return 0
 
     def scheduleForHandle(self,handle):

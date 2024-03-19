@@ -13,12 +13,13 @@ class PersonState(Enum):
 class Person:
     SECONDS_UNTIL_REALLY_TIME = 45 * Schedule.SECONDS_PER_MINUTE
 
-    def __init__(self, name, button, lightControl, schedule):
+    def __init__(self, name, button, lightControl, schedule, overdueTimeout):
         self.logger = logging.getLogger(name)
         self.name = name
         self.button = button
         self.lightControl = lightControl
         self.schedule = schedule
+        self.overdueTimeout = overdueTimeout
         self.state = None
         self.setState(PersonState.IDLE)
         pass
@@ -70,5 +71,5 @@ class Person:
 
     def isReallyTimeToStartChores(self):
         delta = time.time() - self.stateStarted
-        self.logger.debug("delta is: %d vs %d" % (delta, Person.SECONDS_UNTIL_REALLY_TIME))
-        return Person.SECONDS_UNTIL_REALLY_TIME <= delta
+        self.logger.debug("delta is: %d vs %d" % (delta, self.overdueTimeout))
+        return self.overdueTimeout <= delta
