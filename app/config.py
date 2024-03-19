@@ -9,6 +9,10 @@ class Config:
     LED_PIN = "led_pin"
     BUTTON_PIN = "button_pin"
 
+    TIMING = "timing"
+    LOOP_DELAY = "loop_delay"
+    DEFAULT_LOOP_DELAY = 0.01
+
     SCHEDULE = "schedule"
     MONDAY = "monday"
     TUESDAY = "tuesday"
@@ -28,7 +32,8 @@ class Config:
         pass
 
     def printConfig(self):
-        print("simulated %s", (self.isSimMode()))
+        print("simulated %s" % (self.isSimMode()))
+        print("loop delay = %f" % (self.getLoopDelay()))
         for handle in self.getHandles():
             print("===============================")
             print("    handle: %s" % (handle))
@@ -46,6 +51,12 @@ class Config:
 
     def isSimMode(self):
         return self.config[Config.SIM_MODE]
+
+    def getLoopDelay(self):
+        try:
+            return self.config[Config.TIMING][Config.LOOP_DELAY];
+        except KeyError:
+            return DEFAULT_LOOP_DELAY
 
     def getHandles(self):
         return list(self.config[Config.PEOPLE].keys())
