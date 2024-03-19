@@ -10,6 +10,7 @@ class Button(IButton):
         IButton.__init__(self)
         self.logger = logging.getLogger("btn")
         self.logger.info("Creating INPUT/Pull-UP button for pin %d" % (button_pin))
+        self.button_pin = button_pin
         self.button = DigitalIO(arcade_qt, button_pin)
         self.button.direction = Direction.INPUT
         self.button.pull = Pull.UP
@@ -18,4 +19,4 @@ class Button(IButton):
         return not self.button.value
 
     def __str__(self):
-        return str(self.button._pin)
+        return "b%s" % (str(self.button_pin))

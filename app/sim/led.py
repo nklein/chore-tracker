@@ -12,3 +12,6 @@ class LED(ILED):
             self.logger.debug("Setting brightness %s -> %d for led %d"
                               % (self.lastBrightness, brightness, self.led_pin))
             self.lastBrightness = brightness
+
+    def __str__(self):
+        return "l%s" % (str(self.led_pin))

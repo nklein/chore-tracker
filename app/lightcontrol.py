@@ -6,8 +6,8 @@ class LightControl:
     MAX_BRIGHTNESS = 65535
     PULSE_WAVELENGTH = 5
 
-    def __init__(self, led):
-        self.logger = logging.getLogger("lightctl")
+    def __init__(self, name, led):
+        self.logger = logging.getLogger("l:%s" % (name))
         self.led = led
         self.cycleStarted = 0
         self.speed = 0

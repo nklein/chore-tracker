@@ -40,15 +40,24 @@ class Application:
         pass
 
     def createPeople(self):
+        ledbuttons = dict()
         overdueTimeout = self.config.getOverdueTimeout()
+
         for handle in self.config.getHandles():
             name = self.config.getPersonName(handle)
+            ledbuttonName = self.config.getPersonLEDButtonName(handle)
+            ledbuttons[ ledbuttonName ] = True
             led_pin = self.config.getPersonLEDPin(handle)
             button_pin = self.config.getPersonButtonPin(handle)
             ledbutton = self.factory.makeLEDButton(led_pin, button_pin)
-            lightControl = LightControl(ledbutton)
+            lightControl = LightControl(ledbuttonName, ledbutton)
             schedule = self.scheduleForHandle(handle)
             self.people[handle] = Person(name, ledbutton, lightControl, schedule, overdueTimeout)
+
+        if len(ledbuttons.keys()) < len(self.config.getHandles()):
+            self.logger.fatal("Fewer buttons (%s) than people (%s)"
+                              % (list(ledbuttons.keys()), self.config.getHandles()))
+            return 1
         return 0
 
     def scheduleForHandle(self,handle):

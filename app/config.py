@@ -4,10 +4,14 @@ class Config:
     SIM_MODE = "sim_mode"
 
     DEFAULTS = "defaults"
-    PEOPLE = "people"
-    NAME = "name"
+
+    LEDBUTTONS = "ledbuttons"
     LED_PIN = "led_pin"
     BUTTON_PIN = "button_pin"
+
+    PEOPLE = "people"
+    NAME = "name"
+    LEDBUTTON = "ledbutton"
 
     TIMING = "timing"
     LOOP_DELAY = "loop_delay"
@@ -37,12 +41,19 @@ class Config:
         print("simulated %s" % (self.isSimMode()))
         print("loop delay = %f" % (self.getLoopDelay()))
         print("overdue timeout = %f" % (self.getOverdueTimeout()))
+
+        for button in self.getLEDButtonNames():
+            print("===============================")
+            print("    button: %s" % (button))
+            print("   led_pin: %s" % (self.getLEDButtonLEDPin(button)))
+            print("button_pin: %s" % (self.getLEDButtonButtonPin(button)))
+            print("===============================")
+
         for handle in self.getHandles():
             print("===============================")
             print("    handle: %s" % (handle))
             print("      name: %s" % (self.getPersonName(handle)))
-            print("   led_pin: %s" % (self.getPersonLEDPin(handle)))
-            print("button_pin: %s" % (self.getPersonButtonPin(handle)))
+            print(" ledbutton: %s" % (self.getPersonLEDButtonName(handle)))
             print("    sunday: %s" % (self.getPersonSchedule(handle, Config.SUNDAY)))
             print("    monday: %s" % (self.getPersonSchedule(handle, Config.MONDAY)))
             print("   tuesday: %s" % (self.getPersonSchedule(handle, Config.TUESDAY)))
@@ -67,17 +78,29 @@ class Config:
         except KeyError:
             return DEFAULT_OVERDUE_TIMEOUT
 
+    def getLEDButtonNames(self):
+        return list(self.config[Config.LEDBUTTONS].keys())
+
+    def getLEDButtonLEDPin(self, button):
+        return self.config[Config.LEDBUTTONS][button][Config.LED_PIN];
+
+    def getLEDButtonButtonPin(self, button):
+        return self.config[Config.LEDBUTTONS][button][Config.BUTTON_PIN];
+
     def getHandles(self):
         return list(self.config[Config.PEOPLE].keys())
 
     def getPersonName(self, handle):
         return self.config[Config.PEOPLE][handle][Config.NAME]
 
+    def getPersonLEDButtonName(self, handle):
+        return self.config[Config.PEOPLE][handle][Config.LEDBUTTON]
+
     def getPersonLEDPin(self, handle):
-        return self.config[Config.PEOPLE][handle][Config.LED_PIN]
+        return self.getLEDButtonLEDPin(self.getPersonLEDButtonName(handle))
 
     def getPersonButtonPin(self, handle):
-        return self.config[Config.PEOPLE][handle][Config.BUTTON_PIN]
+        return self.getLEDButtonButtonPin(self.getPersonLEDButtonName(handle))
 
     def getPersonSchedule(self, handle, day):
         try:
