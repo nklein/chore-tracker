@@ -43,6 +43,7 @@
     }
   },
   "timing": {
-    "loop_delay": 1.0
+    "loop_delay": 1.0,
+    "overdue_timeout": 2700
   }
 }

@@ -11,7 +11,9 @@ class Config:
 
     TIMING = "timing"
     LOOP_DELAY = "loop_delay"
+    OVERDUE_TIMEOUT = "overdue_timeout"
     DEFAULT_LOOP_DELAY = 0.01
+    DEFAULT_OVERDUE_TIMEOUT = 2700;
 
     SCHEDULE = "schedule"
     MONDAY = "monday"
@@ -34,6 +36,7 @@ class Config:
     def printConfig(self):
         print("simulated %s" % (self.isSimMode()))
         print("loop delay = %f" % (self.getLoopDelay()))
+        print("overdue timeout = %f" % (self.getOverdueTimeout()))
         for handle in self.getHandles():
             print("===============================")
             print("    handle: %s" % (handle))
@@ -57,6 +60,12 @@ class Config:
             return self.config[Config.TIMING][Config.LOOP_DELAY];
         except KeyError:
             return DEFAULT_LOOP_DELAY
+
+    def getOverdueTimeout(self):
+        try:
+            return self.config[Config.TIMING][Config.OVERDUE_TIMEOUT];
+        except KeyError:
+            return DEFAULT_OVERDUE_TIMEOUT
 
     def getHandles(self):
         return list(self.config[Config.PEOPLE].keys())
