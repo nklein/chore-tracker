@@ -15,14 +15,14 @@ from stemma_qt.factory import LEDButtonFactory
 from sim.factory import LEDButtonFactory as SimLEDButtonFactory
 
 class Application:
-    DELAY = 0.01
-
     def __init__(self):
         self.config = Config()
         self.people = dict()
         self.configFile = "../etc/config.json"
         self.daemonMode = False
         self.logger = None
+        self.loopDelay = 0.01
+        pass
 
     def setupFactory(self):
         self.logger.debug("Making button factory")
@@ -62,9 +62,10 @@ class Application:
 
     def mainLoop(self):
         while True:
+            now = time.time()
             for person in self.people.values():
-                person.tick()
-            time.sleep(Application.DELAY)
+                person.tick(now)
+            time.sleep(self.loopDelay)
         return 0
 
     def setupLogger(self):
@@ -114,11 +115,16 @@ class Application:
         self.config.printConfig()
         return 0
 
+    def setupLocalParameters(self):
+        self.loopDelay = self.config.getLoopDelay()
+        return 0
+
     def main(self):
         return (
             self.parseArgs()
             or self.setupLogger()
             or self.readConfig()
+            or self.setupLocalParameters()
             or self.setupFactory()
             or self.createPeople()
             or self.mainLoop()

@@ -23,14 +23,12 @@ class Person:
         self.setState(PersonState.IDLE)
         pass
 
-    def tick(self):
-        state = self.button.getButtonState()
-        if state == ButtonState.PRESSED:
+    def tick(self, now=time.time()):
+        btnState = self.button.getButtonState()
+        if btnState == ButtonState.PRESSING:
             self.lightControl.disable()
-        else:
+        elif btnState == ButtonState.RELEASING:
             self.lightControl.enable()
-
-        if state == ButtonState.RELEASING:
             if self.state == PersonState.IDLE:
                 self.setState(PersonState.TIME_FOR_CHORES)
             elif self.state == PersonState.TIME_FOR_CHORES or self.state == PersonState.REALLY_TIME_FOR_CHORES:
@@ -43,7 +41,7 @@ class Person:
         elif self.state == PersonState.TIME_FOR_CHORES and self.isReallyTimeToStartChores():
             self.setState(PersonState.REALLY_TIME_FOR_CHORES)
 
-        self.lightControl.tick()
+        self.lightControl.tick(now)
         pass
 
     def setState(self, state):

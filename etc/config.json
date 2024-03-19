@@ -1,5 +1,5 @@
 {
-  "sim_mode": false,
+  "sim_mode": true,
   "defaults": {
     "schedule": {
       "sunday": [ "15:00" ],
@@ -41,5 +41,8 @@
       "led_pin": 12,
       "button_pin": 18
     }
+  },
+  "timing": {
+    "loop_delay": 1.0
   }
 }

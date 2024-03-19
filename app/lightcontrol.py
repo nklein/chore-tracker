@@ -1,12 +1,15 @@
+import time
+import logging
 
 class LightControl:
     MIN_BRIGHTNESS = 2048
     MAX_BRIGHTNESS = 65535
-    PULSE_WAVELENGTH = 20
+    PULSE_WAVELENGTH = 5
 
     def __init__(self, led):
+        self.logger = logging.getLogger("lightctl")
         self.led = led
-        self.tickCount = 0
+        self.cycleStarted = 0
         self.speed = 0
         self.brightness = LightControl.MIN_BRIGHTNESS
         self.enable()
@@ -15,7 +18,9 @@ class LightControl:
 
     def enable(self):
         self.enabled = True
-        self.__set_light__()
+        self.cycleStarted = time.time()
+        self.logger.info("Enable %s" % (self.led))
+        self.__set_light__(self.cycleStarted)
         pass
 
     def disable(self):
@@ -23,15 +28,14 @@ class LightControl:
         self.__set_light__()
         pass
 
-    def tick(self):
-        self.tickCount += 1
-        self.__set_light__()
+    def tick(self, now):
+        self.__set_light__(now)
         pass
 
     def pulse(self, speed):
+        self.cycleStarted = time.time()
         self.speed = speed
-        self.tickCount = 0
-        self.__set_light__()
+        self.__set_light__(self.cycleStarted)
         pass
 
     def on(self):
@@ -55,21 +59,23 @@ class LightControl:
     def isPulsing(self):
         return self.speed > 0
 
-    def __set_light__(self):
-        self.led.setBrightness(self.__get_brightness__())
+    def __set_light__(self, now=None):
+        self.led.setBrightness(self.__get_brightness__(now))
         pass
 
-    def __get_brightness__(self):
+    def __get_brightness__(self, now):
         if self.enabled:
             if self.isPulsing():
-                return self.__calc_pulse_brightness__()
+                return self.__calc_pulse_brightness__(now)
             else:
                 return self.brightness
         return 0
 
-    def __calc_pulse_brightness__(self):
-        distance = ( self.speed * self.tickCount ) % LightControl.PULSE_WAVELENGTH
-        lessThanHalfway = ( distance * 2 <= LightControl.PULSE_WAVELENGTH )
-        height = distance if lessThanHalfway else ( LightControl.PULSE_WAVELENGTH - distance )
-        delta = ( LightControl.MAX_BRIGHTNESS - LightControl.MIN_BRIGHTNESS ) * height * 2
-        return round(( delta / LightControl.PULSE_WAVELENGTH ) + LightControl.MIN_BRIGHTNESS)
+    def __calc_pulse_brightness__(self, now):
+        self.logger.debug("Calculating pulse brightness for (%f - %f) = %d"
+                          % (now, self.cycleStarted, round(now - self.cycleStarted)))
+        elapsed = (now - self.cycleStarted) * self.speed / LightControl.PULSE_WAVELENGTH
+        portion = elapsed - int(elapsed)
+        height = 2 * (portion if (portion <= 0.5) else (1.0 - portion))
+        delta = ( LightControl.MAX_BRIGHTNESS - LightControl.MIN_BRIGHTNESS ) * height
+        return round(delta) + LightControl.MIN_BRIGHTNESS
